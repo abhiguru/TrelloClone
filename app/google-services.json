@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "960951383815",
+    "project_id": "webfas",
+    "storage_bucket": "webfas.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:960951383815:android:1be9352efa550eaf4777a2",
+        "android_client_info": {
+          "package_name": "in.tutorial.trelloclone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "960951383815-d77k6mkdudauul14866m30qce30f5p79.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDSRCWoMmYNTd-OzwNQlOwnHc3zABGGSE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "960951383815-d77k6mkdudauul14866m30qce30f5p79.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
