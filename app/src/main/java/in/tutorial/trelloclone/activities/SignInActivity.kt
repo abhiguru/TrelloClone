@@ -1,15 +1,10 @@
 package `in`.tutorial.trelloclone.activities
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.widget.Toast
-import android.window.OnBackInvokedDispatcher
-import androidx.activity.OnBackPressedDispatcher
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
 import `in`.tutorial.trelloclone.R
 import `in`.tutorial.trelloclone.databinding.ActivitySignInBinding
 import `in`.tutorial.trelloclone.firebase.FirestoreClass
@@ -40,7 +35,7 @@ class SignInActivity : BaseActivity() {
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         val user = auth.currentUser
-                        FirestoreClass().signInUser(this)
+                        FirestoreClass().loadUserData(this)
                     } else {
                         // If sign in fails, display a message to the user.
                         Toast.makeText(baseContext, "Authentication failed. ${task.exception}",
