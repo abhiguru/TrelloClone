@@ -16,10 +16,20 @@
         android:theme="@style/Theme.TrelloClone"
         tools:targetApi="31">
         <activity
-            android:name=".activities.TaskListActivity"
+            android:name=".activities.CardDetailsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.TrelloClone.NoActionBar"
             android:exported="false" />
+        <activity
+            android:name=".activities.MembersActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.TrelloClone.NoActionBar" />
+        <activity
+            android:name=".activities.TaskListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.TrelloClone.NoActionBar" />
         <activity
             android:name=".activities.CreateBoard"
             android:exported="false"
