@@ -25,7 +25,7 @@ class TaskListActivity : BaseActivity() {
     companion object{
         const val MEMBERS_REQUEST_CODE : Int = 13
     }
-    private lateinit var mAssignedMemberDetailList: ArrayList<User>
+    lateinit var mAssignedMemberDetailList: ArrayList<User>
     private lateinit var mBoardDetails : Board
     private lateinit var boardDocumentId:String
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,13 +44,7 @@ class TaskListActivity : BaseActivity() {
         mBoardDetails = board
         hideProgressDialog()
         setupActionBar()
-        val addTaskList = Task(resources.getString(R.string.add_list))
-        board.taskList.add(addTaskList)
-        binding?.rvTaskList?.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding?.rvTaskList?.setHasFixedSize(true)
-        val adapter = TaskListItemsAdapter(this, board.taskList)
-        binding?.rvTaskList?.adapter = adapter
+
         showProgressDialog(resources.getString(R.string.please_wait))
         FirestoreClass().getAssignedMembersListDetails(
             this@TaskListActivity, mBoardDetails.assignedTo)
@@ -151,5 +145,18 @@ class TaskListActivity : BaseActivity() {
     fun boardMembersDetailsList(list:ArrayList<User>){
         mAssignedMemberDetailList = list
         hideProgressDialog()
+        val addTaskList = Task(resources.getString(R.string.add_list))
+        mBoardDetails.taskList.add(addTaskList)
+        binding?.rvTaskList?.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding?.rvTaskList?.setHasFixedSize(true)
+        val adapter = TaskListItemsAdapter(this, mBoardDetails.taskList)
+        binding?.rvTaskList?.adapter = adapter
+    }
+    fun updateCardsInTaskList(taskListPosition: Int, cards: ArrayList<Card>){
+        mBoardDetails.taskList.removeAt(mBoardDetails.taskList.size - 1)
+        mBoardDetails.taskList[taskListPosition].cards = cards
+        showProgressDialog(resources.getString(R.string.please_wait))
+        FirestoreClass().addUpdateTaskList(this, mBoardDetails)
     }
 }
