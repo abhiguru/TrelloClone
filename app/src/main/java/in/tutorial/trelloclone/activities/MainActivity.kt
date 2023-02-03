@@ -1,7 +1,9 @@
 package `in`.tutorial.trelloclone.activities
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -11,8 +13,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
 import `in`.tutorial.trelloclone.R
 import `in`.tutorial.trelloclone.adapters.BoardItemsAdapter
 import `in`.tutorial.trelloclone.databinding.ActivityMainBinding
@@ -26,6 +30,7 @@ import java.io.IOException
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     var binding : ActivityMainBinding? = null
     private lateinit var mUsername:String
+    private lateinit var mSharedPreferences: SharedPreferences
     companion object{
         const val MY_PROFILE_REQ_CODE: Int = 11
     }
@@ -41,7 +46,19 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         setContentView(binding?.root)
         setupActionBar()
         binding?.navView?.setNavigationItemSelectedListener(this)
+        mSharedPreferences = this.getSharedPreferences(Constants.PROJEMANAG_PREFERENCES,
+            Context.MODE_PRIVATE)
         FirestoreClass().loadUserData(this, true)
+        val tokenUpdated =
+            mSharedPreferences.getBoolean(Constants.FCM_TOKEN_UPDATED, false)
+        if(tokenUpdated){
+            showProgressDialog(resources.getString(R.string.please_wait))
+            FirestoreClass().loadUserData(this, true)
+        }else{
+            FirebaseMessaging.getInstance().token.addOnSuccessListener(this@MainActivity){
+                updateFCMToken(it)
+            }
+        }
         binding?.appBarMain?.fabCreateBoard?.setOnClickListener {
             var intent = Intent(this, CreateBoard::class.java)
             intent.putExtra(Constants.NAME, mUsername)
@@ -77,6 +94,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
             R.id.nav_sign_out->{
                 FirebaseAuth.getInstance().signOut()
+                mSharedPreferences.edit().clear().apply()
                 val intent = Intent(this, IntroActivity::class.java)
                 // Clear activity stack
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -97,6 +115,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
     }
     fun updateNavigationUserDetails(loggedInUser: User, readBoardsList: Boolean) {
+        hideProgressDialog()
         var headerMainBinding:NavHeaderMainBinding? = null
         headerMainBinding = NavHeaderMainBinding.bind(binding?.navView!!.getHeaderView(0))
         Glide
@@ -134,4 +153,19 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             binding?.appBarMain?.contentMainInclude!!.tvNoBoardsAvailable.visibility = View.VISIBLE
         }
     }
+    fun tokenUpdateSuccess() {
+        hideProgressDialog()
+        val editor:SharedPreferences.Editor = mSharedPreferences.edit()
+        editor.putBoolean(Constants.FCM_TOKEN_UPDATED, true)
+        editor.apply()
+        showProgressDialog(resources.getString(R.string.please_wait))
+        FirestoreClass().loadUserData(this, true)
+    }
+    private fun updateFCMToken(token:String){
+        val userHashMap = HashMap<String, Any>()
+        userHashMap[Constants.FCM_TOKEN] = token
+        showProgressDialog(resources.getString(R.string.please_wait))
+        FirestoreClass().updateUserProfileData(this, userHashMap)
+    }
+
 }
